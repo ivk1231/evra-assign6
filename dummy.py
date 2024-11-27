@@ -13,7 +13,7 @@ class Net(nn.Module):
             nn.Conv2d(1, 16, 3, padding=1),  # 28x28x16
             nn.ReLU(),
             nn.BatchNorm2d(16),
-            nn.Dropout(0.1)
+            nn.Dropout(0.05)
         )
         
         # CONV Block 1
@@ -21,7 +21,7 @@ class Net(nn.Module):
             nn.Conv2d(16, 32, 3, padding=1),  # 28x28x32
             nn.ReLU(),
             nn.BatchNorm2d(32),
-            nn.Dropout(0.1)
+            nn.Dropout(0.05)
         )
         
         # Transition Block 1
@@ -35,7 +35,11 @@ class Net(nn.Module):
             nn.Conv2d(16, 32, 3, padding=1),  # 14x14x32
             nn.ReLU(),
             nn.BatchNorm2d(32),
-            nn.Dropout(0.1)
+            nn.Dropout(0.05),
+            nn.Conv2d(32, 32, 3, padding=1),  # 14x14x32
+            nn.ReLU(),
+            nn.BatchNorm2d(32),
+            nn.Dropout(0.05)
         )
         
         # Transition Block 2
@@ -49,7 +53,7 @@ class Net(nn.Module):
             nn.Conv2d(16, 16, 3, padding=1),  # 7x7x16
             nn.ReLU(),
             nn.BatchNorm2d(16),
-            nn.Dropout(0.1)
+            nn.Dropout(0.05)
         )
         
         # Output Block
@@ -106,29 +110,39 @@ def main():
     device = torch.device("cuda" if use_cuda else "cpu")
     
     torch.manual_seed(1)
-    batch_size = 64
+    batch_size = 32  # Reduced batch size
+
+    # Enhanced data augmentation
+    train_transform = transforms.Compose([
+        transforms.RandomRotation((-10.0, 10.0)),
+        transforms.RandomAffine(degrees=0, translate=(0.1, 0.1)),
+        transforms.ToTensor(),
+        transforms.Normalize((0.1307,), (0.3081,))
+    ])
+
+    test_transform = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize((0.1307,), (0.3081,))
+    ])
 
     kwargs = {'num_workers': 1, 'pin_memory': True} if use_cuda else {}
     train_loader = torch.utils.data.DataLoader(
         datasets.MNIST('../data', train=True, download=True,
-                      transform=transforms.Compose([
-                          transforms.RandomRotation((-7.0, 7.0)),
-                          transforms.ToTensor(),
-                          transforms.Normalize((0.1307,), (0.3081,))
-                      ])),
+                      transform=train_transform),
         batch_size=batch_size, shuffle=True, **kwargs)
     
     test_loader = torch.utils.data.DataLoader(
         datasets.MNIST('../data', train=False,
-                      transform=transforms.Compose([
-                          transforms.ToTensor(),
-                          transforms.Normalize((0.1307,), (0.3081,))
-                      ])),
+                      transform=test_transform),
         batch_size=batch_size, shuffle=True, **kwargs)
 
     model = Net().to(device)
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
-    scheduler = optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=20, steps_per_epoch=len(train_loader))
+    optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-4)
+    scheduler = optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, 
+                                            epochs=20, 
+                                            steps_per_epoch=len(train_loader),
+                                            pct_start=0.2,
+                                            anneal_strategy='cos')
 
     for epoch in range(1, 20):
         print(f'\nEpoch: {epoch}')
