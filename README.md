@@ -15,4 +15,25 @@ The model achieves the following performance:
 - Test Accuracy: >99.4%
 - Training Epochs: <20
 
-## Project Structure
+## Requirements
+- Python 3.8+
+- PyTorch
+- torchvision
+- tqdm
+- pytest
+
+## Setup and Training
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Run training:
+   ```bash
+   python dummy.py
+   ```
+
+## Tests
+Run tests using:
+```bash
+pytest
