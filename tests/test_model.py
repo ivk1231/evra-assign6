@@ -48,26 +48,33 @@ def test_model_accuracy():
     val_dataset = Subset(test_dataset, val_indices)
     test_dataset = Subset(test_dataset, test_indices)
     
-    val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=50, shuffle=False)
-    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=64, shuffle=False)
+    val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=32, shuffle=False)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=32, shuffle=False)
+
+    # Enhanced data augmentation matching dummy.py
+    train_transform = transforms.Compose([
+        transforms.RandomRotation((-10.0, 10.0)),
+        transforms.RandomAffine(degrees=0, translate=(0.1, 0.1)),
+        transforms.ToTensor(),
+        transforms.Normalize((0.1307,), (0.3081,))
+    ])
 
     # Train the model
     train_loader = torch.utils.data.DataLoader(
         datasets.MNIST('../data', train=True, download=True,
-                      transform=transforms.Compose([
-                          transforms.RandomRotation((-7.0, 7.0)),
-                          transforms.ToTensor(),
-                          transforms.Normalize((0.1307,), (0.3081,))
-                      ])),
-        batch_size=64, shuffle=True)
+                      transform=train_transform),
+        batch_size=32, shuffle=True)
 
     model = Net().to(device)
-    optimizer = torch.optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
-    scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.1, epochs=15, 
-                                                   steps_per_epoch=len(train_loader))
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-4)
+    scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, 
+                                                   epochs=20,
+                                                   steps_per_epoch=len(train_loader),
+                                                   pct_start=0.2,
+                                                   anneal_strategy='cos')
     
     best_val_acc = 0
-    for epoch in range(15):  # Less than 20 epochs
+    for epoch in range(20):  # Changed to 20 epochs
         # Training
         model.train()
         for batch_idx, (data, target) in enumerate(train_loader):
