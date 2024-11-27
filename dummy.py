@@ -73,7 +73,7 @@ def train(model, device, train_loader, optimizer, epoch):
         optimizer.step()
         pbar.set_description(desc= f'loss={loss.item():.4f} batch_id={batch_idx}')
 
-def test(model, device, test_loader):
+def evaluate(model, device, test_loader):
     model.eval()
     test_loss = 0
     correct = 0
@@ -119,7 +119,7 @@ def main():
     for epoch in range(1, 20):
         print(f'\nEpoch: {epoch}')
         train(model, device, train_loader, optimizer, epoch)
-        test(model, device, test_loader)
+        evaluate(model, device, test_loader)
         scheduler.step()
 
 if __name__ == '__main__':

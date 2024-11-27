@@ -1,6 +1,6 @@
 import torch
 from torchvision import datasets, transforms
-from dummy import Net, test
+from dummy import Net, evaluate
 
 def test_parameter_count():
     model = Net()
@@ -26,19 +26,40 @@ def test_model_accuracy():
     use_cuda = torch.cuda.is_available()
     device = torch.device("cuda" if use_cuda else "cpu")
     
-    # Load the test dataset
+    # Load the test dataset with download=True
     test_loader = torch.utils.data.DataLoader(
-        datasets.MNIST('../data', train=False,
+        datasets.MNIST('../data', train=False, download=True,
                       transform=transforms.Compose([
                           transforms.ToTensor(),
                           transforms.Normalize((0.1307,), (0.3081,))
                       ])),
         batch_size=128, shuffle=True)
 
-    # Load model and evaluate
+    # Train the model first
+    train_loader = torch.utils.data.DataLoader(
+        datasets.MNIST('../data', train=True, download=True,
+                      transform=transforms.Compose([
+                          transforms.ToTensor(),
+                          transforms.Normalize((0.1307,), (0.3081,))
+                      ])),
+        batch_size=128, shuffle=True)
+
     model = Net().to(device)
-    model.eval()
+    optimizer = torch.optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
     
+    # Train for a few epochs
+    model.train()
+    for epoch in range(5):  # Reduced number of epochs for testing
+        for batch_idx, (data, target) in enumerate(train_loader):
+            data, target = data.to(device), target.to(device)
+            optimizer.zero_grad()
+            output = model(data)
+            loss = torch.nn.functional.nll_loss(output, target)
+            loss.backward()
+            optimizer.step()
+    
+    # Evaluate
+    model.eval()
     correct = 0
     total = 0
     
@@ -51,4 +72,4 @@ def test_model_accuracy():
             total += target.size(0)
     
     accuracy = 100. * correct / total
-    assert accuracy >= 99.4, f"Model accuracy is {accuracy:.2f}%, which is below the required 99.4%" 
+    assert accuracy >= 99.4, f"Model accuracy is {accuracy:.2f}%, which is below the required 99.4%"
