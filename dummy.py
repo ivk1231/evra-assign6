@@ -10,55 +10,55 @@ class Net(nn.Module):
         super(Net, self).__init__()
         # Input Block
         self.conv1 = nn.Sequential(
-            nn.Conv2d(1, 32, 3, padding=1),  # 28x28x32
+            nn.Conv2d(1, 16, 3, padding=1),  # 28x28x16
             nn.ReLU(),
-            nn.BatchNorm2d(32),
+            nn.BatchNorm2d(16),
             nn.Dropout(0.1)
         )
         
         # CONV Block 1
         self.conv2 = nn.Sequential(
-            nn.Conv2d(32, 64, 3, padding=1),  # 28x28x64
-            nn.ReLU(),
-            nn.BatchNorm2d(64),
-            nn.Dropout(0.1)
-        )
-        
-        # Transition Block 1
-        self.trans1 = nn.Sequential(
-            nn.MaxPool2d(2, 2),  # 14x14x64
-            nn.Conv2d(64, 32, 1)  # 14x14x32
-        )
-        
-        # CONV Block 2
-        self.conv3 = nn.Sequential(
-            nn.Conv2d(32, 64, 3, padding=1),  # 14x14x64
-            nn.ReLU(),
-            nn.BatchNorm2d(64),
-            nn.Dropout(0.1)
-        )
-        
-        # Transition Block 2
-        self.trans2 = nn.Sequential(
-            nn.MaxPool2d(2, 2),  # 7x7x64
-            nn.Conv2d(64, 32, 1)  # 7x7x32
-        )
-        
-        # CONV Block 3
-        self.conv4 = nn.Sequential(
-            nn.Conv2d(32, 32, 3, padding=1),  # 7x7x32
+            nn.Conv2d(16, 32, 3, padding=1),  # 28x28x32
             nn.ReLU(),
             nn.BatchNorm2d(32),
             nn.Dropout(0.1)
         )
         
+        # Transition Block 1
+        self.trans1 = nn.Sequential(
+            nn.MaxPool2d(2, 2),  # 14x14x32
+            nn.Conv2d(32, 16, 1)  # 14x14x16
+        )
+        
+        # CONV Block 2
+        self.conv3 = nn.Sequential(
+            nn.Conv2d(16, 32, 3, padding=1),  # 14x14x32
+            nn.ReLU(),
+            nn.BatchNorm2d(32),
+            nn.Dropout(0.1)
+        )
+        
+        # Transition Block 2
+        self.trans2 = nn.Sequential(
+            nn.MaxPool2d(2, 2),  # 7x7x32
+            nn.Conv2d(32, 16, 1)  # 7x7x16
+        )
+        
+        # CONV Block 3
+        self.conv4 = nn.Sequential(
+            nn.Conv2d(16, 16, 3, padding=1),  # 7x7x16
+            nn.ReLU(),
+            nn.BatchNorm2d(16),
+            nn.Dropout(0.1)
+        )
+        
         # Output Block
         self.gap = nn.Sequential(
-            nn.AvgPool2d(kernel_size=7)  # 1x1x32
+            nn.AvgPool2d(kernel_size=7)  # 1x1x16
         )
         
         self.conv5 = nn.Sequential(
-            nn.Conv2d(32, 10, 1)  # 1x1x10
+            nn.Conv2d(16, 10, 1)  # 1x1x10
         )
 
     def forward(self, x):
