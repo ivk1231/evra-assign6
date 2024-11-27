@@ -17,4 +17,7 @@ jobs:
         pip install torch torchvision tqdm pytest
     - name: Run tests
       run: |
-        python -m pytest tests/test_model.py 
+        python -m pytest -v tests/test_model.py
+    - name: Train and Test Model
+      run: |
+        python dummy.py 
