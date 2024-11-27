@@ -36,4 +36,16 @@ The model achieves the following performance:
 ## Tests
 Run tests using:
 ```bash
-pytest
+pytest tests/test_model.py
+```
+
+## Viewing Test Logs
+1. Go to the GitHub repository
+2. Click on the "Actions" tab
+3. Click on the latest workflow run
+4. In the workflow run, click on the "test" job
+5. Expand the "Run tests" step to see detailed test logs
+
+You can also see test logs locally by running:
+```bash
+pytest -v tests/test_model.py
