@@ -1,0 +1,14 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Python files
+*.py text diff=python
+
+# YAML files
+*.yml text
+
+# Markdown files
+*.md text
+
+# Requirements files
+requirements.txt text 
