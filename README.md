@@ -2,7 +2,7 @@
 
 This repository contains a PyTorch implementation of a CNN model for MNIST digit classification.
 
-I have achieved a max of 99.2% accuracy. check out the master branch with V99.12% commit.
+I have achieved a max of 99.2% accuracy. check out the master branch with V99.12% final  commit.
 
 ## Model Architecture
 - Uses less than 20k parameters
