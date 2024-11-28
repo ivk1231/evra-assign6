@@ -1,5 +1,5 @@
 # MNIST Classification with PyTorch
-
+comment:- i tried around 33 iterations, and i have achieved upto 99.2% efficiency.
 This repository contains a PyTorch implementation of a CNN model for MNIST digit classification.
 
 ## Model Architecture
